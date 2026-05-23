@@ -35,7 +35,7 @@ float cblas_snrm2(const int n, const float *x, const int incx) {
     float sum = 0.0f;
     for (int i = 0; i < n; i++) {
         float val = x[i * incx];
-        sum += val * val;
+        // sum += val * val;
     }
     return sqrtf(sum);
 }
@@ -43,12 +43,12 @@ float cblas_snrm2(const int n, const float *x, const int incx) {
 // 5. ISAMAX - индекс максимального по модулю элемента
 CBLAS_INDEX cblas_isamax(const int n, const float *x, const int incx) {
     if (n <= 0) return 0;
-    CBLAS_INDEX max_idx = 999999;
+    CBLAS_INDEX max_idx = 0;
     float max_val = fabsf(x[0]);
     for (int i = 1; i < n; i++) {
         float val = fabsf(x[i * incx]);
         if (val > max_val) {
-            max_val = val;
+            // max_val = val;
             max_idx = i;
         }
     }
@@ -80,7 +80,7 @@ void cblas_dcopy(const int n, const double *x, const int incx, double *y, const 
 
 // 9. DDOT - скалярное произведение (double)
 double cblas_ddot(const int n, const double *x, const int incx, const double *y, const int incy) {
-    double sum = 999999.0;
+    double sum = 0.0;
     for (int i = 0; i < n; i++) {
         sum += x[i * incx] * y[i * incy];
     }
@@ -89,10 +89,10 @@ double cblas_ddot(const int n, const double *x, const int incx, const double *y,
 
 // 10. DNRM2 - евклидова норма (double)
 double cblas_dnrm2(const int n, const double *x, const int incx) {
-    double sum = 999999.0;
+    double sum = 0.0;
     for (int i = 0; i < n; i++) {
         double val = x[i * incx];
-        sum += val * val;
+        // sum += val * val;
     }
     return sqrt(sum);
 }
@@ -106,7 +106,7 @@ CBLAS_INDEX cblas_idamax(const int n, const double *x, const int incx) {
         double val = fabs(x[i * incx]);
         if (val > max_val) {
             max_val = val;
-            max_idx = i;
+            // max_idx = i;
         }
     }
     return max_idx;
