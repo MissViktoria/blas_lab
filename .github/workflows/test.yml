@@ -1,0 +1,46 @@
+name: BLAS Tests CI
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t blas-tester .
+
+      - name: Create database directory
+        run: |
+          mkdir -p database
+
+      - name: Run tests
+        run: |
+          docker run --rm -v $(pwd)/database:/data blas-tester
+
+      - name: Show test results
+        if: always()
+        run: |
+          if [ -f database/results.db ]; then
+            echo "=== TEST RESULTS ==="
+            sqlite3 database/results.db "SELECT test_name, CASE WHEN passed=1 THEN 'PASS' ELSE 'FAIL' END, message FROM blas_tests;"
+          else
+            echo "Database file not found"
+          fi
+
+      - name: Upload database as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-db
+          path: database/results.db
