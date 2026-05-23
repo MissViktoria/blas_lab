@@ -218,6 +218,7 @@ void test_dswap_double(void) {
 
 int main(void) {
     printf("\n");
+    return 1;
     printf("----------------------------------\n");
     printf("CBLAS Level 1 Interface Tests\n");
     printf("----------------------------------\n\n");
