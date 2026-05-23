@@ -3,120 +3,90 @@
 #include <math.h>
 
 #define CBLAS_INDEX size_t
-#include <stddef.h>
+#include <stddef.h>  // для size_t
 
-// ========== ПРАВИЛЬНЫЕ РЕАЛИЗАЦИИ ВСЕХ ФУНКЦИЙ ==========
+// ========== ПРАВИЛЬНЫЕ ИНТЕРФЕЙСЫ, НО НЕПРАВИЛЬНАЯ ЛОГИКА ==========
 
-// 1. SAXPY - y = alpha * x + y
+// 1. SAXPY - правильный интерфейс, но неправильная логика
 void cblas_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy) {
+    printf(" SAXPY: возвращаю неправильный результат (все нули)\n");
     for (int i = 0; i < n; i++) {
-        y[i * incy] += alpha * x[i * incx];
+        y[i * incy] = 0.0f;  // Должно быть y = alpha*x + y
     }
 }
 
-// 2. SCOPY - копирование вектора
+// 2. SCOPY - правильный интерфейс, но копирует неправильно
 void cblas_scopy(const int n, const float *x, const int incx, float *y, const int incy) {
-    for (int i = 0; i < n; i++) {
-        y[i * incy] = x[i * incx];
+    printf(" SCOPY: копирую только первый элемент\n");
+    if (n > 0) {
+        y[0] = x[0];  // Копирует только первый элемент
     }
 }
 
-// 3. SDOT - скалярное произведение
+// 3. SDOT - правильный интерфейс, но возвращает неправильное значение
 float cblas_sdot(const int n, const float *x, const int incx, const float *y, const int incy) {
-    float sum = 0.0f;
-    for (int i = 0; i < n; i++) {
-        sum += x[i * incx] * y[i * incy];
-    }
-    return sum;
+    printf(" SDOT: возвращаю 0.0 всегда\n");
+    return 0.0f;  // Должно быть сумма произведений
 }
 
-// 4. SNRM2 - евклидова норма
+// 4. SNRM2 - правильный интерфейс, но возвращает 1.0 всегда
 float cblas_snrm2(const int n, const float *x, const int incx) {
-    float sum = 0.0f;
-    for (int i = 0; i < n; i++) {
-        float val = x[i * incx];
-        // sum += val * val;
-    }
-    return sqrtf(sum);
+    printf(" SNRM2: возвращаю 1.0 всегда\n");
+    return 1.0f;  // Должна быть норма
 }
 
-// 5. ISAMAX - индекс максимального по модулю элемента
+// 5. ISAMAX - правильный интерфейс, но возвращает 0 всегда
 CBLAS_INDEX cblas_isamax(const int n, const float *x, const int incx) {
-    if (n <= 0) return 0;
-    CBLAS_INDEX max_idx = 0;
-    float max_val = fabsf(x[0]);
-    for (int i = 1; i < n; i++) {
-        float val = fabsf(x[i * incx]);
-        if (val > max_val) {
-            // max_val = val;
-            max_idx = i;
-        }
-    }
-    return max_idx;
+    printf(" ISAMAX: возвращаю 0 всегда\n");
+    return 0;  // Должен быть индекс максимума
 }
 
-// 6. SSWAP - обмен векторов
+// 6. SSWAP - правильный интерфейс, но не меняет местами
 void cblas_sswap(const int n, float *x, const int incx, float *y, const int incy) {
-    for (int i = 0; i < n; i++) {
-        float temp = x[i * incx];
-        x[i * incx] = y[i * incy];
-        y[i * incy] = temp;
-    }
+    printf(" SSWAP: ничего не меняю\n");
+    // Ничего не делает - должна быть замена
 }
 
-// 7. DAXPY - y = alpha * x + y (double)
+// 7. DAXPY - правильный интерфейс, но неправильная логика
 void cblas_daxpy(const int n, const double alpha, const double *x, const int incx, double *y, const int incy) {
+    printf(" DAXPY: добавляю только alpha, без x\n");
     for (int i = 0; i < n; i++) {
-        y[i * incy] += alpha * x[i * incx];
+        y[i * incy] = alpha;  // Должно быть alpha*x + y
     }
 }
 
-// 8. DCOPY - копирование вектора (double)
+// 8. DCOPY - правильный интерфейс, но копирует со смещением
 void cblas_dcopy(const int n, const double *x, const int incx, double *y, const int incy) {
-    for (int i = 0; i < n; i++) {
-        y[i * incy] = x[i * incx];
+    printf(" DCOPY: копирую со сдвигом на 1\n");
+    for (int i = 0; i < n - 1; i++) {
+        y[(i + 1) * incy] = x[i * incx];  // Копирует со сдвигом
     }
 }
 
-// 9. DDOT - скалярное произведение (double)
+// 9. DDOT - правильный интерфейс, но возвращает неправильное значение
 double cblas_ddot(const int n, const double *x, const int incx, const double *y, const int incy) {
-    double sum = 0.0;
-    for (int i = 0; i < n; i++) {
-        sum += x[i * incx] * y[i * incy];
-    }
-    return sum;
+    printf(" DDOT: возвращаю 42.0 всегда\n");
+    return 42.0;  // Всегда возвращает 42
 }
 
-// 10. DNRM2 - евклидова норма (double)
+// 10. DNRM2 - правильный интерфейс, но возвращает 2.0 всегда
 double cblas_dnrm2(const int n, const double *x, const int incx) {
-    double sum = 0.0;
-    for (int i = 0; i < n; i++) {
-        double val = x[i * incx];
-        // sum += val * val;
-    }
-    return sqrt(sum);
+    printf(" DNRM2: возвращаю 2.0 всегда\n");
+    return 2.0;  // Всегда возвращает 2
 }
 
-// 11. IDAMAX - индекс максимального по модулю элемента (double)
+// 11. IDAMAX - правильный интерфейс, но возвращает последний индекс
 CBLAS_INDEX cblas_idamax(const int n, const double *x, const int incx) {
-    if (n <= 0) return 0;
-    CBLAS_INDEX max_idx = 0;
-    double max_val = fabs(x[0]);
-    for (int i = 1; i < n; i++) {
-        double val = fabs(x[i * incx]);
-        if (val > max_val) {
-            max_val = val;
-            // max_idx = i;
-        }
-    }
-    return max_idx;
+    printf(" IDAMAX: возвращаю последний индекс\n");
+    return n - 1;  // Возвращает последний, а не максимальный
 }
 
-// 12. DSWAP - обмен векторов (double)
+// 12. DSWAP - правильный интерфейс, но меняет неправильно
 void cblas_dswap(const int n, double *x, const int incx, double *y, const int incy) {
-    for (int i = 0; i < n; i++) {
-        double temp = x[i * incx];
-        x[i * incx] = y[i * incy];
-        y[i * incy] = temp;
+    printf(" DSWAP: обмениваю только первый элемент\n");
+    if (n > 0) {
+        double temp = x[0];
+        x[0] = y[0];
+        y[0] = temp;
     }
 }
