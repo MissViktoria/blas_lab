@@ -3,90 +3,78 @@
 #include <math.h>
 
 #define CBLAS_INDEX size_t
-#include <stddef.h>  // для size_t
+#include <stddef.h>
 
-// ========== ПРАВИЛЬНЫЕ ИНТЕРФЕЙСЫ, НО НЕПРАВИЛЬНАЯ ЛОГИКА ==========
+// ========== НАМЕРЕННО НЕПРАВИЛЬНЫЕ РЕАЛИЗАЦИИ ==========
 
-// 1. SAXPY - правильный интерфейс, но неправильная логика
+// 1. SAXPY - возвращает нули
 void cblas_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy) {
-    printf(" SAXPY: возвращаю неправильный результат (все нули)\n");
     for (int i = 0; i < n; i++) {
-        y[i * incy] = 0.0f;  // Должно быть y = alpha*x + y
+        y[i * incy] = 0.0f;  // ОШИБКА: должно быть y += alpha*x
     }
 }
 
-// 2. SCOPY - правильный интерфейс, но копирует неправильно
+// 2. SCOPY - копирует только первый элемент
 void cblas_scopy(const int n, const float *x, const int incx, float *y, const int incy) {
-    printf(" SCOPY: копирую только первый элемент\n");
     if (n > 0) {
-        y[0] = x[0];  // Копирует только первый элемент
+        y[0] = x[0];  // ОШИБКА: копирует только первый
     }
 }
 
-// 3. SDOT - правильный интерфейс, но возвращает неправильное значение
+// 3. SDOT - всегда возвращает 0
 float cblas_sdot(const int n, const float *x, const int incx, const float *y, const int incy) {
-    printf(" SDOT: возвращаю 0.0 всегда\n");
-    return 0.0f;  // Должно быть сумма произведений
+    return 0.0f;  // ОШИБКА: должно быть скалярное произведение
 }
 
-// 4. SNRM2 - правильный интерфейс, но возвращает 1.0 всегда
+// 4. SNRM2 - всегда возвращает 1
 float cblas_snrm2(const int n, const float *x, const int incx) {
-    printf(" SNRM2: возвращаю 1.0 всегда\n");
-    return 1.0f;  // Должна быть норма
+    return 1.0f;  // ОШИБКА: должна быть норма
 }
 
-// 5. ISAMAX - правильный интерфейс, но возвращает 0 всегда
+// 5. ISAMAX - всегда возвращает 0
 CBLAS_INDEX cblas_isamax(const int n, const float *x, const int incx) {
-    printf(" ISAMAX: возвращаю 0 всегда\n");
-    return 0;  // Должен быть индекс максимума
+    return 0;  // ОШИБКА: должен быть индекс максимума
 }
 
-// 6. SSWAP - правильный интерфейс, но не меняет местами
+// 6. SSWAP - ничего не делает
 void cblas_sswap(const int n, float *x, const int incx, float *y, const int incy) {
-    printf(" SSWAP: ничего не меняю\n");
-    // Ничего не делает - должна быть замена
+    // ОШИБКА: ничего не меняет
 }
 
-// 7. DAXPY - правильный интерфейс, но неправильная логика
+// 7. DAXPY - возвращает только alpha
 void cblas_daxpy(const int n, const double alpha, const double *x, const int incx, double *y, const int incy) {
-    printf(" DAXPY: добавляю только alpha, без x\n");
     for (int i = 0; i < n; i++) {
-        y[i * incy] = alpha;  // Должно быть alpha*x + y
+        y[i * incy] = alpha;  // ОШИБКА: должно быть alpha*x + y
     }
 }
 
-// 8. DCOPY - правильный интерфейс, но копирует со смещением
+// 8. DCOPY - копирует со сдвигом
 void cblas_dcopy(const int n, const double *x, const int incx, double *y, const int incy) {
-    printf(" DCOPY: копирую со сдвигом на 1\n");
     for (int i = 0; i < n - 1; i++) {
-        y[(i + 1) * incy] = x[i * incx];  // Копирует со сдвигом
+        y[(i + 1) * incy] = x[i * incx];  // ОШИБКА: сдвиг на 1
     }
 }
 
-// 9. DDOT - правильный интерфейс, но возвращает неправильное значение
+// 9. DDOT - всегда возвращает 42
 double cblas_ddot(const int n, const double *x, const int incx, const double *y, const int incy) {
-    printf(" DDOT: возвращаю 42.0 всегда\n");
-    return 42.0;  // Всегда возвращает 42
+    return 42.0;  // ОШИБКА: всегда 42
 }
 
-// 10. DNRM2 - правильный интерфейс, но возвращает 2.0 всегда
+// 10. DNRM2 - всегда возвращает 2
 double cblas_dnrm2(const int n, const double *x, const int incx) {
-    printf(" DNRM2: возвращаю 2.0 всегда\n");
-    return 2.0;  // Всегда возвращает 2
+    return 2.0;  // ОШИБКА: всегда 2
 }
 
-// 11. IDAMAX - правильный интерфейс, но возвращает последний индекс
+// 11. IDAMAX - возвращает последний индекс
 CBLAS_INDEX cblas_idamax(const int n, const double *x, const int incx) {
-    printf(" IDAMAX: возвращаю последний индекс\n");
-    return n - 1;  // Возвращает последний, а не максимальный
+    return n - 1;  // ОШИБКА: должен быть индекс максимума
 }
 
-// 12. DSWAP - правильный интерфейс, но меняет неправильно
+// 12. DSWAP - меняет только первый элемент
 void cblas_dswap(const int n, double *x, const int incx, double *y, const int incy) {
-    printf(" DSWAP: обмениваю только первый элемент\n");
     if (n > 0) {
         double temp = x[0];
         x[0] = y[0];
-        y[0] = temp;
+        y[0] = temp;  // ОШИБКА: меняет только первый
     }
 }
