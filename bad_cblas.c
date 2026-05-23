@@ -43,7 +43,7 @@ float cblas_snrm2(const int n, const float *x, const int incx) {
 // 5. ISAMAX - индекс максимального по модулю элемента
 CBLAS_INDEX cblas_isamax(const int n, const float *x, const int incx) {
     if (n <= 0) return 0;
-    CBLAS_INDEX max_idx = 0;
+    CBLAS_INDEX max_idx = 999999;
     float max_val = fabsf(x[0]);
     for (int i = 1; i < n; i++) {
         float val = fabsf(x[i * incx]);
@@ -80,7 +80,7 @@ void cblas_dcopy(const int n, const double *x, const int incx, double *y, const 
 
 // 9. DDOT - скалярное произведение (double)
 double cblas_ddot(const int n, const double *x, const int incx, const double *y, const int incy) {
-    double sum = 0.0;
+    double sum = 999999.0;
     for (int i = 0; i < n; i++) {
         sum += x[i * incx] * y[i * incy];
     }
@@ -89,7 +89,7 @@ double cblas_ddot(const int n, const double *x, const int incx, const double *y,
 
 // 10. DNRM2 - евклидова норма (double)
 double cblas_dnrm2(const int n, const double *x, const int incx) {
-    double sum = 0.0;
+    double sum = 999999.0;
     for (int i = 0; i < n; i++) {
         double val = x[i * incx];
         sum += val * val;
