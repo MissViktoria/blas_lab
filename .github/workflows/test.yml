@@ -33,7 +33,7 @@ jobs:
         run: |
           if [ -f database/results.db ]; then
             echo "=== TEST RESULTS ==="
-            sqlite3 database/results.db "SELECT test_name, CASE WHEN passed=1 THEN 'PASS' ELSE 'FAIL' END, message FROM blas_tests;"
+            sqlite3 database/results.db "SELECT test_name, CASE WHEN passed=1 THEN 'PASS' ELSE 'FAIL' END FROM blas_tests;"
           else
             echo "Database file not found"
           fi
